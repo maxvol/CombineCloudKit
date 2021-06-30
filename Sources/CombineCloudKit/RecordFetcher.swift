@@ -9,28 +9,26 @@ import Combine
 import CloudKit
 
 @available(macOS 10, iOS 13, *)
-final class RecordFetcher {
+final class RecordFetcher<S> where S: Subscriber, S.Failure == Error, S.Input == CKRecord {
     
-    typealias Observer = AnyObserver<CKRecord>
-    
-    private let observer: Observer
+    private let subscriber: S
     private let database: CKDatabase
     private let limit: Int
     
-    init(observer: Observer, database: CKDatabase, query: CKQuery, limit: Int) {
-        self.observer = observer
+    init(subscriber: S, database: CKDatabase, query: CKQuery, limit: Int) {
+        self.subscriber = subscriber
         self.database = database
         self.limit = limit
         self.fetch(query: query)
     }
     
     private func recordFetchedBlock(record: CKRecord) {
-        self.observer.on(.next(record))
+        _ = self.subscriber.receive(record)
     }
     
     private func queryCompletionBlock(cursor: CKQueryOperation.Cursor?, error: Error?) {
         if let error = error {
-            observer.on(.error(error))
+            subscriber.receive(completion: .failure(error))
             return
         }
         if let cursor = cursor {
@@ -38,7 +36,7 @@ final class RecordFetcher {
             self.setupAndAdd(operation: operation)
             return
         }
-        observer.on(.completed)
+        subscriber.receive(completion: .finished)
     }
     
     private func fetch(query: CKQuery) {

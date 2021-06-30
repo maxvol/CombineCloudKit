@@ -35,19 +35,19 @@ final class RecordChangeFetcher<S> where S: Subscriber, S.Failure == Error, S.In
     // MARK:- callbacks
     
     private func recordChangedBlock(record: CKRecord) {
-        self.subscriber.receive(.changed(record))
+        _ = self.subscriber.receive(.changed(record))
     }
     
     private func recordWithIDWasDeletedBlock(recordID: CKRecord.ID, undocumented: String) {
         print("\(recordID)|\(undocumented)") // TEMP undocumented?
-        self.subscriber.receive(.deleted(recordID))
+        _ = self.subscriber.receive(.deleted(recordID))
     }
     
     private func recordZoneChangeTokensUpdatedBlock(zoneID: CKRecordZone.ID, serverChangeToken: CKServerChangeToken?, clientChangeTokenData: Data?) {
         self.updateToken(zoneID: zoneID, serverChangeToken: serverChangeToken)
         
         if let token = serverChangeToken {
-            self.subscriber.receive(.token(zoneID, token))
+            _ = self.subscriber.receive(.token(zoneID, token))
         }
         // TODO clientChangeTokenData?
     }
@@ -62,7 +62,7 @@ final class RecordChangeFetcher<S> where S: Subscriber, S.Failure == Error, S.In
         self.updateToken(zoneID: zoneID, serverChangeToken: serverChangeToken)
 
         if let token = serverChangeToken {
-            self.subscriber.receive(.token(zoneID, token))
+            _ = self.subscriber.receive(.token(zoneID, token))
         }
         
 //        if moreComing {
