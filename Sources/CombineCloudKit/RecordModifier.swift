@@ -16,21 +16,19 @@ public enum RecordModifyEvent {
     case deleted([CKRecord.ID])
 }
 
-@available(iOS 10, *)
-final class RecordModifier {
-    
-    typealias Observer = AnyObserver<RecordModifyEvent>
+@available(macOS 10, iOS 13, *)
+final class RecordModifier<S> where S: Subscriber, S.Failure == Error, S.Input == RecordModifyEvent {
     
     fileprivate var index = 0
     fileprivate var chunk = 400
     
-    private let observer: Observer
+    private let subscriber: S
     private let database: CKDatabase
     private let records: [CKRecord]?
     private let recordIDs: [CKRecord.ID]?
     
-    init(observer: Observer, database: CKDatabase, recordsToSave records: [CKRecord]?, recordIDsToDelete recordIDs: [CKRecord.ID]?) {
-        self.observer = observer
+    init(subscriber: S, database: CKDatabase, recordsToSave records: [CKRecord]?, recordIDsToDelete recordIDs: [CKRecord.ID]?) {
+        self.subscriber = subscriber
         self.database = database
         self.records = records
         self.recordIDs = recordIDs
@@ -67,12 +65,12 @@ final class RecordModifier {
     
     // save progress
     private func perRecordProgressBlock(record: CKRecord, progress: Double) {
-        observer.on(.next(.progress(record, progress)))
+        _ = subscriber.receive(.progress(record, progress))
     }
     
     // save result
     private func perRecordCompletionBlock(record: CKRecord, error: Error?) {
-       observer.on(.next(.result(record, error)))
+       _ = subscriber.receive(.result(record, error))
     }
     
     private func modifyRecordsCompletionBlock(records: [CKRecord]?, recordIDs: [CKRecord.ID]?, error: Error?) {
@@ -87,20 +85,20 @@ final class RecordModifier {
                     break
                 }
             }
-            observer.on(.error(error))
+            subscriber.receive(completion: .failure(error))
             return
         }
         if let records = records {
-            observer.on(.next(.changed(records)))
+            _ = subscriber.receive(.changed(records))
         }
         if let recordIDs = recordIDs {
-            observer.on(.next(.deleted(recordIDs)))
+            _ = subscriber.receive(.deleted(recordIDs))
         }
         if self.until() < self.count {
             self.index += self.chunk
             self.batch()
         } else {
-            observer.on(.completed)
+            subscriber.receive(completion: .finished)
         }
     }
     

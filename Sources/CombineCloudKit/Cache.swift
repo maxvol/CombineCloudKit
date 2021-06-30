@@ -9,8 +9,9 @@ import os.log
 import Foundation
 import Combine
 import CloudKit
+import UIKit
 
-@available(macOS 10, iOS 13, *)
+@available(iOS 13, *)
 public protocol CacheDelegate {
     // private db
     func cache(record: CKRecord)
@@ -20,7 +21,7 @@ public protocol CacheDelegate {
     func query(notification: CKQueryNotification, fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void)
 }
 
-@available(macOS 10, iOS 13, *)
+@available(iOS 13, *)
 public final class Cache {
 
     static let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as! String
@@ -115,15 +116,15 @@ public final class Cache {
         }
         
         switch notificationType {
-        case CKNotificationType.query:
+        case .query:
             let queryNotification = notification as! CKQueryNotification
             self.delegate.query(notification: queryNotification, fetchCompletionHandler: completionHandler)
-        case CKNotificationType.database:
+        case .database:
             self.fetchDatabaseChanges(fetchCompletionHandler: completionHandler)
-        case CKNotificationType.readNotification:
+        case .readNotification:
             // TODO
             break
-        case CKNotificationType.recordZone:
+        case .recordZone:
             // TODO
             break
         default:
