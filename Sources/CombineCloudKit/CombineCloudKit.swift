@@ -1,3 +1,3 @@
 struct CombineCloudKit {
-    var text = "Hello, World!"
+    var text = "CombineCloudKit"
 }
