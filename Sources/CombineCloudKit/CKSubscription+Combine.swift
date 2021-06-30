@@ -8,6 +8,7 @@
 import Combine
 import CloudKit
 
+/*
 @available(macOS 10, iOS 13, *)
 public extension Reactive where Base: CKSubscription {
 
@@ -84,3 +85,4 @@ public extension Reactive where Base: CKSubscription {
      */
 
 }
+*/

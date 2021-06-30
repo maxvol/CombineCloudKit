@@ -8,9 +8,10 @@
 import Combine
 import CloudKit
 
+/*
 @available(macOS 10, iOS 13, *)
 public extension Reactive where Base: CKRecord {
-    
+/*
     func save(in database: CKDatabase) -> Maybe<CKRecord> {
         return Maybe<CKRecord>.create { maybe in
             database.save(self.base) { (result, error) in
@@ -84,5 +85,6 @@ public extension Reactive where Base: CKRecord {
             return Disposables.create()
         }
     }
-
+*/
 }
+*/

@@ -21,6 +21,7 @@ public protocol CacheDelegate {
     func query(notification: CKQueryNotification, fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void)
 }
 
+/*
 @available(iOS 13, *)
 public final class Cache {
 
@@ -224,3 +225,4 @@ public final class Cache {
     }
 
 }
+*/
