@@ -16,18 +16,16 @@ public enum ZoneEvent {
 }
 
 @available(macOS 10, iOS 13, *)
-final class ZoneChangeFetcher {
+final class ZoneChangeFetcher<S> where S: Subscriber, S.Failure == Error, S.Input == ZoneEvent {
     
-    typealias Observer = AnyObserver<ZoneEvent>
-    
-    private let observer: Observer
+    private let subscriber: S
     private let database: CKDatabase
     private let limit: Int
     
     private var serverChangeToken: CKServerChangeToken?
     
-    init(observer: Observer, database: CKDatabase, previousServerChangeToken: CKServerChangeToken?, limit: Int) {
-        self.observer = observer
+    init(subscriber: S, database: CKDatabase, previousServerChangeToken: CKServerChangeToken?, limit: Int) {
+        self.subscriber = subscriber
         self.database = database
         self.limit = limit
         self.serverChangeToken = previousServerChangeToken
@@ -37,29 +35,29 @@ final class ZoneChangeFetcher {
     // MARK:- callbacks
     
     private func recordZoneWithIDChangedBlock(zoneID: CKRecordZone.ID) {
-        self.observer.on(.next(.changed(zoneID)))
+        _ = self.subscriber.receive(.changed(zoneID))
     }
     
     private func recordZoneWithIDWasDeletedBlock(zoneID: CKRecordZone.ID) {
-        self.observer.on(.next(.deleted(zoneID)))
+        _ = self.subscriber.receive(.deleted(zoneID))
     }
     
     private func changeTokenUpdatedBlock(serverChangeToken: CKServerChangeToken) {
         self.serverChangeToken = serverChangeToken
-        self.observer.on(.next(.token(serverChangeToken)))
+        _ = self.subscriber.receive(.token(serverChangeToken))
     }
     
     private func fetchDatabaseChangesCompletionBlock(serverChangeToken: CKServerChangeToken?, moreComing: Bool, error: Error?) {
         self.serverChangeToken = serverChangeToken
         if let error = error {
-            observer.on(.error(error)) // special handling for CKErrorChangeTokenExpired (purge local cache, fetch with token=nil)
+            subscriber.receive(completion: .failure(error)) // special handling for CKErrorChangeTokenExpired (purge local cache, fetch with token=nil)
             return
         }
         if moreComing {
             self.fetch()
             return
         }
-        observer.on(.completed)
+        subscriber.receive(completion: .finished)
     }
     
     // MARK:- custom

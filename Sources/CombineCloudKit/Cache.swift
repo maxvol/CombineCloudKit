@@ -20,7 +20,7 @@ public protocol CacheDelegate {
     func query(notification: CKQueryNotification, fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void)
 }
 
-@available(iOS 10, *)
+@available(macOS 10, iOS 13, *)
 public final class Cache {
 
     static let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as! String
@@ -35,7 +35,7 @@ public final class Cache {
     public let local = Local()
 
     private let delegate: CacheDelegate
-    private let disposeBag = DisposeBag()
+    private let cancellables: Set<AnyCancellable> = []
     private var cachedZoneIDs: [CKRecordZone.ID] = []
 //    private var missingZoneIDs: [CKRecordZoneID] = []
 
