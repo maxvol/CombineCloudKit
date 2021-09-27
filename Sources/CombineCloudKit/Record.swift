@@ -9,7 +9,7 @@ import CloudKit
 import ObjectiveC
 
 @available(macOS 10, iOS 13, *)
-public protocol RxCKRecord {
+public protocol MetaCKRecord {
 
     /** record type */
     static var type: String { get } // must be implemented by struct
@@ -43,7 +43,7 @@ public protocol RxCKRecord {
 //var AssociatedObjectHandle: UInt8 = 0
 
 @available(macOS 10, iOS 13, *)
-public extension RxCKRecord {
+public extension MetaCKRecord {
 
 //    public var metadata: Data? {
 //        get {
