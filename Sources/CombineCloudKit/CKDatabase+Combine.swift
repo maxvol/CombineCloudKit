@@ -8,10 +8,9 @@
 import Combine
 import CloudKit
 
-/*
 @available(macOS 10, iOS 13, *)
-public extension Reactive where Base: CKDatabase {
-
+public extension CKDatabase {
+/*
     // MARK:- zones
 
     func fetch(with recordZoneID: CKRecordZone.ID) -> Maybe<CKRecordZone> {
@@ -39,11 +38,19 @@ public extension Reactive where Base: CKDatabase {
     func delete(with recordID: CKRecord.ID) -> Maybe<CKRecord.ID> {
         return CKRecord.rx.delete(with: recordID, in: self.base)
     }
+*/
+//    func fetch(recordType: String, predicate: NSPredicate = NSPredicate(value: true), sortDescriptors: [NSSortDescriptor]? = nil, limit: Int = 400) -> Observable<CKRecord> {
+//        return CKRecord.rx.fetch(recordType: recordType, predicate: predicate, sortDescriptors: sortDescriptors, limit: limit, in: self.base)
+//    }
 
-    func fetch(recordType: String, predicate: NSPredicate = NSPredicate(value: true), sortDescriptors: [NSSortDescriptor]? = nil, limit: Int = 400) -> Observable<CKRecord> {
-        return CKRecord.rx.fetch(recordType: recordType, predicate: predicate, sortDescriptors: sortDescriptors, limit: limit, in: self.base)
+    func fetch(recordType: String, predicate: NSPredicate = NSPredicate(value: true), sortDescriptors: [NSSortDescriptor]? = nil, limit: Int = 400) -> AnyPublisher<CKRecord, Error> {
+        return CKRecord
+            .fetch(recordType: recordType, predicate: predicate, sortDescriptors: sortDescriptors, limit: limit, in: self)
+            .eraseToAnyPublisher()
     }
-    
+
+    //
+/*
     @available(iOS 10.0, *)
     func fetchChanges(recordZoneIDs: [CKRecordZone.ID], optionsByRecordZoneID: [CKRecordZone.ID : CKFetchRecordZoneChangesOperation.ZoneOptions]? = nil) -> Observable<RecordEvent> {
         return CKRecord.rx.fetchChanges(recordZoneIDs: recordZoneIDs, optionsByRecordZoneID: optionsByRecordZoneID, in: self.base)
@@ -70,6 +77,6 @@ public extension Reactive where Base: CKDatabase {
     func modify(subscriptionsToSave: [CKSubscription]?, subscriptionIDsToDelete: [String]?) -> Single<([CKSubscription]?, [String]?)> {
         return CKSubscription.rx.modify(subscriptionsToSave: subscriptionsToSave, subscriptionIDsToDelete: subscriptionIDsToDelete, in: self.base)
     }
-
-}
 */
+}
+

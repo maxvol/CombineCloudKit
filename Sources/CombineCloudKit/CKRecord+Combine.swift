@@ -8,9 +8,8 @@
 import Combine
 import CloudKit
 
-/*
 @available(macOS 10, iOS 13, *)
-public extension Reactive where Base: CKRecord {
+public extension CKRecord {
 /*
     func save(in database: CKDatabase) -> Maybe<CKRecord> {
         return Maybe<CKRecord>.create { maybe in
@@ -62,16 +61,16 @@ public extension Reactive where Base: CKRecord {
             return Disposables.create()
         }
     }
-
-    static func fetch(recordType: String, predicate: NSPredicate = NSPredicate(value: true), sortDescriptors: [NSSortDescriptor]? = nil, limit: Int = 400, in database: CKDatabase) -> Observable<CKRecord> {
-        return Observable.create { observer in
-            let query = CKQuery(recordType: recordType, predicate: predicate)
-            query.sortDescriptors = sortDescriptors
-            _ = RecordFetcher(observer: observer, database: database, query: query, limit: limit)
-            return Disposables.create()
-        }
-    }
-    
+*/
+//    static func fetch(recordType: String, predicate: NSPredicate = NSPredicate(value: true), sortDescriptors: [NSSortDescriptor]? = nil, limit: Int = 400, in database: CKDatabase) -> Publisher<CKRecord> {
+//        return Observable.create { observer in
+//            let query = CKQuery(recordType: recordType, predicate: predicate)
+//            query.sortDescriptors = sortDescriptors
+//            _ = RecordFetcher(observer: observer, database: database, query: query, limit: limit)
+//            return Disposables.create()
+//        }
+//    }
+/*
     static func fetchChanges(recordZoneIDs: [CKRecordZone.ID], optionsByRecordZoneID: [CKRecordZone.ID : CKFetchRecordZoneChangesOperation.ZoneOptions]? = nil, in database: CKDatabase) -> Observable<RecordEvent> {
         return Observable.create { observer in
             _ = RecordChangeFetcher(observer: observer, database: database, recordZoneIDs: recordZoneIDs, optionsByRecordZoneID: optionsByRecordZoneID)
@@ -87,4 +86,3 @@ public extension Reactive where Base: CKRecord {
     }
 */
 }
-*/
