@@ -62,14 +62,22 @@ public extension CKRecord {
         }
     }
 */
-//    static func fetch(recordType: String, predicate: NSPredicate = NSPredicate(value: true), sortDescriptors: [NSSortDescriptor]? = nil, limit: Int = 400, in database: CKDatabase) -> Publisher<CKRecord> {
-//        return Observable.create { observer in
-//            let query = CKQuery(recordType: recordType, predicate: predicate)
-//            query.sortDescriptors = sortDescriptors
-//            _ = RecordFetcher(observer: observer, database: database, query: query, limit: limit)
-//            return Disposables.create()
-//        }
-//    }
+    internal static func fetch(recordType: String,
+                      predicate: NSPredicate = NSPredicate(value: true),
+                      sortDescriptors: [NSSortDescriptor]? = nil,
+                      limit: Int = 400,
+                      in database: CKDatabase) -> FetcherPublisher {
+        
+        let query = CKQuery(recordType: recordType, predicate: predicate)
+        query.sortDescriptors = sortDescriptors
+        
+        return FetcherPublisher(
+            database: database,
+            query: query,
+            limit: limit
+        )
+    }
+    
 /*
     static func fetchChanges(recordZoneIDs: [CKRecordZone.ID], optionsByRecordZoneID: [CKRecordZone.ID : CKFetchRecordZoneChangesOperation.ZoneOptions]? = nil, in database: CKDatabase) -> Observable<RecordEvent> {
         return Observable.create { observer in

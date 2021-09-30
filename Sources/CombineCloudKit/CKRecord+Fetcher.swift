@@ -15,9 +15,9 @@ extension CKRecord {
         typealias Output = CKRecord
         typealias Failure = Error
 
-        fileprivate let database: CKDatabase
-        fileprivate let query: CKQuery
-        fileprivate let limit: Int
+        let database: CKDatabase
+        let query: CKQuery
+        let limit: Int
         
         func receive<S: Subscriber>(subscriber: S) where S.Input == Output, S.Failure == Failure {
             let subscription = FetcherSubscription<S>(subscriber: subscriber, publisher: self)
@@ -83,27 +83,6 @@ private extension CKRecord {
             subscriber?.receive(completion: .finished)
         }
         
-    }
-    
-}
-
-@available(macOS 10, iOS 13, *)
-extension CKRecord {
-    
-    static func fetch(recordType: String,
-                      predicate: NSPredicate = NSPredicate(value: true),
-                      sortDescriptors: [NSSortDescriptor]? = nil,
-                      limit: Int = 400,
-                      in database: CKDatabase) -> FetcherPublisher {
-        
-        let query = CKQuery(recordType: recordType, predicate: predicate)
-        query.sortDescriptors = sortDescriptors
-        
-        return FetcherPublisher(
-            database: database,
-            query: query,
-            limit: limit
-        )
     }
     
 }
