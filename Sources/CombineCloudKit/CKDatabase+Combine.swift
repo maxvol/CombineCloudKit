@@ -24,28 +24,27 @@ public extension CKDatabase {
     func fetchChanges(previousServerChangeToken: CKServerChangeToken?, limit: Int = 99) -> Observable<ZoneEvent> {
         return CKRecordZone.rx.fetchChanges(previousServerChangeToken: previousServerChangeToken, limit: limit, in: self.base)
     }
-
+*/
     // MARK:- records
 
-    func save(record: CKRecord) -> Maybe<CKRecord> {
-        return record.rx.save(in: self.base)
+    func savePublisher(record: CKRecord) -> AnyPublisher<CKRecord?, Error> {
+        return record
+            .savePublisher(in: self)
     }
 
-    func fetch(with recordID: CKRecord.ID) -> Maybe<CKRecord> {
-        return CKRecord.rx.fetch(with: recordID, in: self.base)
-    }
-
-    func delete(with recordID: CKRecord.ID) -> Maybe<CKRecord.ID> {
-        return CKRecord.rx.delete(with: recordID, in: self.base)
-    }
-*/
-//    func fetch(recordType: String, predicate: NSPredicate = NSPredicate(value: true), sortDescriptors: [NSSortDescriptor]? = nil, limit: Int = 400) -> Observable<CKRecord> {
-//        return CKRecord.rx.fetch(recordType: recordType, predicate: predicate, sortDescriptors: sortDescriptors, limit: limit, in: self.base)
-//    }
-
-    func fetch(recordType: String, predicate: NSPredicate = NSPredicate(value: true), sortDescriptors: [NSSortDescriptor]? = nil, limit: Int = 400) -> AnyPublisher<CKRecord, Error> {
+    func fetchPublisher(with recordID: CKRecord.ID) -> AnyPublisher<CKRecord?, Error> {
         return CKRecord
-            .fetch(recordType: recordType, predicate: predicate, sortDescriptors: sortDescriptors, limit: limit, in: self)
+            .fetchPublisher(with: recordID, in: self)
+    }
+
+    func deletePublisher(with recordID: CKRecord.ID) -> AnyPublisher<CKRecord.ID?, Error> {
+        return CKRecord
+            .deletePublisher(with: recordID, in: self)
+    }
+
+    func fetchPublisher(recordType: String, predicate: NSPredicate = NSPredicate(value: true), sortDescriptors: [NSSortDescriptor]? = nil, limit: Int = 400) -> AnyPublisher<CKRecord, Error> {
+        return CKRecord
+            .fetchPublisher(recordType: recordType, predicate: predicate, sortDescriptors: sortDescriptors, limit: limit, in: self)
             .eraseToAnyPublisher()
     }
 

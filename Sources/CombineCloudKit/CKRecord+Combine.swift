@@ -10,59 +10,56 @@ import CloudKit
 
 @available(macOS 10, iOS 13, *)
 extension CKRecord {
-/*
-    func save(in database: CKDatabase) -> Maybe<CKRecord> {
-        return Maybe<CKRecord>.create { maybe in
-            database.save(self.base) { (result, error) in
-                if let error = error {
-                    maybe(.error(error))
-                    return
+    
+    func savePublisher(in database: CKDatabase) -> AnyPublisher<CKRecord?, Error> {
+        return Deferred {
+            Future<CKRecord?, Error> { promise in
+                database.save(self) { (record, error) in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(record))
+                    }
                 }
-                guard result != nil else {
-                    maybe(.completed)
-                    return
-                }
-                maybe(.success(result!))
             }
-            return Disposables.create()
+            
         }
+        .eraseToAnyPublisher()
     }
 
-    static func fetch(with recordID: CKRecord.ID, in database: CKDatabase) -> Maybe<CKRecord> {
-        return Maybe<CKRecord>.create { maybe in
-            database.fetch(withRecordID: recordID) { (record, error) in
-                if let error = error {
-                    maybe(.error(error))
-                    return
+    static func fetchPublisher(with recordID: CKRecord.ID, in database: CKDatabase) -> AnyPublisher<CKRecord?, Error> {
+        return Deferred {
+            Future<CKRecord?, Error> { promise in
+                database.fetch(withRecordID: recordID) { (record, error) in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(record))
+                    }
                 }
-                guard record != nil else {
-                    maybe(.completed)
-                    return
-                }
-                maybe(.success(record!))
             }
-            return Disposables.create()
+            
         }
+        .eraseToAnyPublisher()
     }
 
-    static func delete(with recordID: CKRecord.ID, in database: CKDatabase) -> Maybe<CKRecord.ID> {
-        return Maybe<CKRecord.ID>.create { maybe in
-            database.delete(withRecordID: recordID) { (recordID, error) in
-                if let error = error {
-                    maybe(.error(error))
-                    return
+    static func deletePublisher(with recordID: CKRecord.ID, in database: CKDatabase) -> AnyPublisher<CKRecord.ID?, Error> {
+        return Deferred {
+            Future<CKRecord.ID?, Error> { promise in
+                database.delete(withRecordID: recordID) { (recordID, error) in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(recordID))
+                    }
                 }
-                guard recordID != nil else {
-                    maybe(.completed)
-                    return
-                }
-                maybe(.success(recordID!))
             }
-            return Disposables.create()
+            
         }
+        .eraseToAnyPublisher()
     }
-*/
-    static func fetch(recordType: String,
+
+    static func fetchPublisher(recordType: String,
                       predicate: NSPredicate = NSPredicate(value: true),
                       sortDescriptors: [NSSortDescriptor]? = nil,
                       limit: Int = 400,
