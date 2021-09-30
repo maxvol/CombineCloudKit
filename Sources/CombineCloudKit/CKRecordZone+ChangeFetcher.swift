@@ -1,5 +1,5 @@
 //
-//  ZoneFetcher.swift
+//  CKRecordZone+ChangeFetcher.swift
 //
 //
 //  Created by Maxim Volgin on 30/06/2021.
@@ -74,3 +74,5 @@ final class ZoneChangeFetcher<S> where S: Subscriber, S.Failure == Error, S.Inpu
     }
     
 }
+
+//@available(macOS 10, iOS 13, *)
