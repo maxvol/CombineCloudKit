@@ -9,7 +9,7 @@ import Combine
 import CloudKit
 
 @available(macOS 10, iOS 13, *)
-public extension CKRecord {
+extension CKRecord {
 /*
     func save(in database: CKDatabase) -> Maybe<CKRecord> {
         return Maybe<CKRecord>.create { maybe in
@@ -62,7 +62,7 @@ public extension CKRecord {
         }
     }
 */
-    internal static func fetch(recordType: String,
+    static func fetch(recordType: String,
                       predicate: NSPredicate = NSPredicate(value: true),
                       sortDescriptors: [NSSortDescriptor]? = nil,
                       limit: Int = 400,
