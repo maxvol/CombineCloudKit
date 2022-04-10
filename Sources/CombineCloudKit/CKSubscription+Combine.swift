@@ -8,81 +8,75 @@
 import Combine
 import CloudKit
 
-/*
 @available(macOS 10, iOS 13, *)
-public extension Reactive where Base: CKSubscription {
-
-    func save(in database: CKDatabase) -> Maybe<CKSubscription> {
-        return Maybe<CKSubscription>.create { maybe in
-            database.save(self.base) { (result, error) in
-                if let error = error {
-                    maybe(.error(error))
-                    return
+extension CKSubscription {
+    
+    func savePublisher(in database: CKDatabase) -> AnyPublisher<CKSubscription?, Error> {
+        Deferred {
+            Future<CKSubscription?, Error> { promise in
+                database.save(self) { (subscription, error) in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(subscription))
+                    }
                 }
-                guard result != nil else {
-                    maybe(.completed)
-                    return
-                }
-                maybe(.success(result!))
             }
-            return Disposables.create()
         }
+        .eraseToAnyPublisher()
     }
     
-    static func fetch(with subscriptionID: String, in database: CKDatabase) -> Maybe<CKSubscription> {
-        return Maybe<CKSubscription>.create { maybe in
-            database.fetch(withSubscriptionID: subscriptionID) { (subscription, error) in
-                if let error = error {
-                    maybe(.error(error))
-                    return
+    static func fetchPublisher(with subscriptionID: String, in database: CKDatabase) -> AnyPublisher<CKSubscription?, Error> {
+        Deferred {
+            Future<CKSubscription?, Error> { promise in
+                database.fetch(withSubscriptionID: subscriptionID) { (subscription, error) in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(subscription))
+                    }
                 }
-                guard subscription != nil else {
-                    maybe(.completed)
-                    return
-                }
-                maybe(.success(subscription!))
             }
-            return Disposables.create()
         }
+        .eraseToAnyPublisher()
     }
     
-    static func delete(with subscriptionID: String, in database: CKDatabase) -> Maybe<String> {
-        return Maybe<String>.create { maybe in
-            database.delete(withSubscriptionID: subscriptionID) { (subscriptionID, error) in
-                if let error = error {
-                    maybe(.error(error))
-                    return
+    static func deletePublisher(with subscriptionID: String, in database: CKDatabase) -> AnyPublisher<String?, Error> {
+        Deferred {
+            Future<String?, Error> { promise in
+                database.delete(withSubscriptionID: subscriptionID) { (subscriptionID, error) in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(subscriptionID))
+                    }
                 }
-                guard subscriptionID != nil else {
-                    maybe(.completed)
-                    return
-                }
-                maybe(.success(subscriptionID!))
             }
-            return Disposables.create()
         }
+        .eraseToAnyPublisher()
     }
     
-    static func modify(subscriptionsToSave: [CKSubscription]?, subscriptionIDsToDelete: [String]?, in database: CKDatabase) -> Single<([CKSubscription]?, [String]?)> {
-        return Single<([CKSubscription]?, [String]?)>.create { single in
-            let operation = CKModifySubscriptionsOperation(subscriptionsToSave: subscriptionsToSave, subscriptionIDsToDelete: subscriptionIDsToDelete)
-            operation.qualityOfService = .utility
-            operation.modifySubscriptionsCompletionBlock = { (subscriptions, deletedIds, error) in
-                if let error = error {
-                    single(.error(error))
-                    return
+    static func modifyPublisher(subscriptionsToSave: [CKSubscription]?, subscriptionIDsToDelete: [String]?, in database: CKDatabase) -> AnyPublisher<([CKSubscription]?, [String]?), Error> {
+        Deferred {
+            Future<([CKSubscription]?, [String]?), Error> { promise in
+                let operation = CKModifySubscriptionsOperation(subscriptionsToSave: subscriptionsToSave, subscriptionIDsToDelete: subscriptionIDsToDelete)
+                operation.qualityOfService = .utility
+                operation.modifySubscriptionsCompletionBlock = { (subscriptions, deletedIds, error) in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success((subscriptions, deletedIds)))
+                    }
                 }
-                single(.success((subscriptions, deletedIds)))
+                database.add(operation)
             }
-            database.add(operation)
-            return Disposables.create()
         }
+        .eraseToAnyPublisher()
     }
-
+    
     /*
      func fetchAllSubscriptions(completionHandler: ([CKSubscription]?, Error?) -> Void)
      Fetches all subscription objects asynchronously, with a low priority, from the current database.
      */
 
 }
-*/

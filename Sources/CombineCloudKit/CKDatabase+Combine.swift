@@ -58,25 +58,23 @@ public extension CKDatabase {
             .eraseToAnyPublisher()
     }
 
-/*
-
     // MARK:- subscriptions
 
-    func save(subscription: CKSubscription) -> Maybe<CKSubscription> {
-        return subscription.rx.save(in: self.base)
+    func savePublisher(subscription: CKSubscription) -> AnyPublisher<CKSubscription?, Error> {
+        return subscription.savePublisher(in: self)
     }
 
-    func fetch(with subscriptionID: String) -> Maybe<CKSubscription> {
-        return CKSubscription.rx.fetch(with: subscriptionID, in: self.base)
+    func fetchPublisher(with subscriptionID: String) -> AnyPublisher<CKSubscription?, Error> {
+        return CKSubscription.fetchPublisher(with: subscriptionID, in: self)
     }
 
-    func delete(with subscriptionID: String) -> Maybe<String> {
-        return CKSubscription.rx.delete(with: subscriptionID, in: self.base)
+    func deletePublisher(with subscriptionID: String) -> AnyPublisher<String?, Error> {
+        return CKSubscription.deletePublisher(with: subscriptionID, in: self)
     }
 
-    func modify(subscriptionsToSave: [CKSubscription]?, subscriptionIDsToDelete: [String]?) -> Single<([CKSubscription]?, [String]?)> {
-        return CKSubscription.rx.modify(subscriptionsToSave: subscriptionsToSave, subscriptionIDsToDelete: subscriptionIDsToDelete, in: self.base)
+    func modifyPublisher(subscriptionsToSave: [CKSubscription]?, subscriptionIDsToDelete: [String]?) -> AnyPublisher<([CKSubscription]?, [String]?), Error> {
+        return CKSubscription.modifyPublisher(subscriptionsToSave: subscriptionsToSave, subscriptionIDsToDelete: subscriptionIDsToDelete, in: self)
     }
-*/
+
 }
 
