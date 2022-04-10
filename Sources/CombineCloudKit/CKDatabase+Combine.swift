@@ -16,12 +16,9 @@ public extension CKDatabase {
         return CKRecordZone.fetchPublisher(with: recordZoneID, in: self)
     }
 
-    /*
-
-    func modify(recordZonesToSave: [CKRecordZone]?, recordZoneIDsToDelete: [CKRecordZone.ID]?) -> Single<([CKRecordZone]?, [CKRecordZone.ID]?)> {
-        return CKRecordZone.rx.modify(recordZonesToSave: recordZonesToSave, recordZoneIDsToDelete: recordZoneIDsToDelete, in: self.base)
+    func modifyPublisher(recordZonesToSave: [CKRecordZone]?, recordZoneIDsToDelete: [CKRecordZone.ID]?) -> AnyPublisher<([CKRecordZone]?, [CKRecordZone.ID]?), Error> {
+        return CKRecordZone.modifyPublisher(recordZonesToSave: recordZonesToSave, recordZoneIDsToDelete: recordZoneIDsToDelete, in: self)
     }
-     */
 
     func fetchChangesPublisher(previousServerChangeToken: CKServerChangeToken?, limit: Int = 99) -> AnyPublisher<ZoneEvent, Error> {
         CKRecordZone

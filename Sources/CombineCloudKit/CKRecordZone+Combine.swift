@@ -25,27 +25,25 @@ extension CKRecordZone {
         }
         .eraseToAnyPublisher()
     }
-/*
 
-    static func modify(recordZonesToSave: [CKRecordZone]?, recordZoneIDsToDelete: [CKRecordZone.ID]?, in database: CKDatabase) -> Single<([CKRecordZone]?, [CKRecordZone.ID]?)> {
-        return Single<([CKRecordZone]?, [CKRecordZone.ID]?)>.create { single in
-            let operation = CKModifyRecordZonesOperation(recordZonesToSave: recordZonesToSave, recordZoneIDsToDelete: recordZoneIDsToDelete)
-            operation.qualityOfService = .userInitiated
-            operation.modifyRecordZonesCompletionBlock = { (saved, deleted, error) in
-                if let error = error {
-                    single(.error(error))
-                    return
+    static func modifyPublisher(recordZonesToSave: [CKRecordZone]?, recordZoneIDsToDelete: [CKRecordZone.ID]?, in database: CKDatabase) -> AnyPublisher<([CKRecordZone]?, [CKRecordZone.ID]?), Error> {
+        Deferred {
+            Future<([CKRecordZone]?, [CKRecordZone.ID]?), Error> { promise in
+                let operation = CKModifyRecordZonesOperation(recordZonesToSave: recordZonesToSave, recordZoneIDsToDelete: recordZoneIDsToDelete)
+                operation.qualityOfService = .userInitiated
+                operation.modifyRecordZonesCompletionBlock = { (saved, deleted, error) in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success((saved, deleted)))
+                    }
                 }
-                single(.success((saved, deleted)))
+                database.add(operation)
             }
-            database.add(operation)
-            return Disposables.create()
         }
+        .eraseToAnyPublisher()
     }
 
-
-*/
-    
     static func fetchChangesPublisher(previousServerChangeToken: CKServerChangeToken?, limit: Int = 400, in database: CKDatabase) -> FetchChangesPublisher {
         FetchChangesPublisher(
             database: database,

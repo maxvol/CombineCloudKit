@@ -49,21 +49,20 @@ public final class Cache {
     public func applicationDidFinishLaunching(fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void = { _ in }) {
         let zones = zoneIDs.map({ Zone.create(name: $0) })
 
-#warning ("TODO")
-// TODO:
-//        cloud
-//            .privateDB
-//            .rx
-//            .modify(recordZonesToSave: zones, recordZoneIDsToDelete: nil).subscribe { event in
-//                switch event {
-//                case .success(let (saved, deleted)):
-//                    os_log("saved", log: Log.cache, type: .info)
-//                case .error(let error):
-//                    os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
-//                }
-//            }
-        //        .sink()
-        //        .store(in: &self.cancellableSet)
+        cloud
+            .privateDB
+            .modifyPublisher(recordZonesToSave: zones, recordZoneIDsToDelete: nil)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
+                case .finished:
+                    os_log("saved", log: Log.cache, type: .info)
+                }
+            }, receiveValue: { (saved, deleted) in
+                // no-op
+            })
+            .store(in: &self.cancellableSet)
 
         if let subscriptionId = self.local.subscriptionID(for: Cache.privateSubscriptionID) {
 //            cloud
@@ -82,7 +81,6 @@ public final class Cache {
 // TODO:
 //            cloud
 //                .privateDB
-//                .rx
 //                .modify(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil).subscribe { event in
 //                    switch event {
 //                    case .success(let (saved, deleted)):
@@ -152,7 +150,6 @@ public final class Cache {
                         completionHandler(.noData)
                     }
                 }
-
             }, receiveValue: { zoneEvent in
                 switch zoneEvent {
                 case .changed(let zoneID):
