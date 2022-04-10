@@ -21,10 +21,8 @@ public protocol CacheDelegate {
     func query(notification: CKQueryNotification, fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void)
 }
 
-/*
 @available(iOS 13, *)
 public final class Cache {
-
     static let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as! String
     static let privateSubscriptionID = "\(appName).privateDatabaseSubscriptionID"
     static let sharedSubscriptionID = "\(appName).sharedDatabaseSubscriptionID"
@@ -45,6 +43,8 @@ public final class Cache {
         self.delegate = delegate
         self.zoneIDs = zoneIDs
     }
+
+/*
 
     public func applicationDidFinishLaunching(fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void = { _ in }) {
 
@@ -208,21 +208,23 @@ public final class Cache {
             }
             .disposed(by: disposeBag)
     }
+ 
+     public func processAndPurgeCachedZones(fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+         guard !self.cachedZoneIDs.isEmpty else {
+             completionHandler(.noData)
+             return
+         }
+
+         let recordZoneIDs = self.cachedZoneIDs
+         self.cachedZoneIDs = []
+         self.fetchZoneChanges(recordZoneIDs: recordZoneIDs, fetchCompletionHandler: completionHandler)
+     }
+
+
+ */
 
     public func cacheChanged(zoneID: CKRecordZone.ID) {
         self.cachedZoneIDs.append(zoneID)
     }
 
-    public func processAndPurgeCachedZones(fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        guard !self.cachedZoneIDs.isEmpty else {
-            completionHandler(.noData)
-            return
-        }
-
-        let recordZoneIDs = self.cachedZoneIDs
-        self.cachedZoneIDs = []
-        self.fetchZoneChanges(recordZoneIDs: recordZoneIDs, fetchCompletionHandler: completionHandler)
-    }
-
 }
-*/
