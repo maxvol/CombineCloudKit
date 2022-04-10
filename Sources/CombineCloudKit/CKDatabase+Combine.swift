@@ -28,36 +28,36 @@ public extension CKDatabase {
     // MARK:- records
 
     func savePublisher(record: CKRecord) -> AnyPublisher<CKRecord?, Error> {
-        return record
-            .savePublisher(in: self)
+        record.savePublisher(in: self)
     }
 
     func fetchPublisher(with recordID: CKRecord.ID) -> AnyPublisher<CKRecord?, Error> {
-        return CKRecord
-            .fetchPublisher(with: recordID, in: self)
+        CKRecord.fetchPublisher(with: recordID, in: self)
     }
 
     func deletePublisher(with recordID: CKRecord.ID) -> AnyPublisher<CKRecord.ID?, Error> {
-        return CKRecord
-            .deletePublisher(with: recordID, in: self)
+        CKRecord.deletePublisher(with: recordID, in: self)
     }
 
     func fetchPublisher(recordType: String, predicate: NSPredicate = NSPredicate(value: true), sortDescriptors: [NSSortDescriptor]? = nil, limit: Int = 400) -> AnyPublisher<CKRecord, Error> {
-        return CKRecord
+        CKRecord
             .fetchPublisher(recordType: recordType, predicate: predicate, sortDescriptors: sortDescriptors, limit: limit, in: self)
             .eraseToAnyPublisher()
     }
 
-    //
-/*
-    @available(iOS 10.0, *)
-    func fetchChanges(recordZoneIDs: [CKRecordZone.ID], optionsByRecordZoneID: [CKRecordZone.ID : CKFetchRecordZoneChangesOperation.ZoneOptions]? = nil) -> Observable<RecordEvent> {
-        return CKRecord.rx.fetchChanges(recordZoneIDs: recordZoneIDs, optionsByRecordZoneID: optionsByRecordZoneID, in: self.base)
+    func fetchChangesPublisher(recordZoneIDs: [CKRecordZone.ID], optionsByRecordZoneID: [CKRecordZone.ID : CKFetchRecordZoneChangesOperation.ZoneOptions]? = nil) -> AnyPublisher<RecordEvent, Error> {
+        CKRecord
+            .fetchChangesPublisher(recordZoneIDs: recordZoneIDs, optionsByRecordZoneID: optionsByRecordZoneID, in: self)
+            .eraseToAnyPublisher()
     }
     
-    func modify(recordsToSave records: [CKRecord]?, recordIDsToDelete recordIDs: [CKRecord.ID]?) -> Observable<RecordModifyEvent> {
-        return CKRecord.rx.modify(recordsToSave: records, recordIDsToDelete: recordIDs, in: self.base)
+    func modify(recordsToSave records: [CKRecord]?, recordIDsToDelete recordIDs: [CKRecord.ID]?) -> AnyPublisher<RecordModifyEvent, Error> {
+        CKRecord
+            .modifyPublisher(recordsToSave: records, recordIDsToDelete: recordIDs, in: self)
+            .eraseToAnyPublisher()
     }
+
+/*
 
     // MARK:- subscriptions
 

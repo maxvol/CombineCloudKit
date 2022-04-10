@@ -12,7 +12,7 @@ import CloudKit
 extension CKRecord {
     
     func savePublisher(in database: CKDatabase) -> AnyPublisher<CKRecord?, Error> {
-        return Deferred {
+        Deferred {
             Future<CKRecord?, Error> { promise in
                 database.save(self) { (record, error) in
                     if let error = error {
@@ -22,13 +22,12 @@ extension CKRecord {
                     }
                 }
             }
-            
         }
         .eraseToAnyPublisher()
     }
 
     static func fetchPublisher(with recordID: CKRecord.ID, in database: CKDatabase) -> AnyPublisher<CKRecord?, Error> {
-        return Deferred {
+        Deferred {
             Future<CKRecord?, Error> { promise in
                 database.fetch(withRecordID: recordID) { (record, error) in
                     if let error = error {
@@ -38,13 +37,12 @@ extension CKRecord {
                     }
                 }
             }
-            
         }
         .eraseToAnyPublisher()
     }
 
     static func deletePublisher(with recordID: CKRecord.ID, in database: CKDatabase) -> AnyPublisher<CKRecord.ID?, Error> {
-        return Deferred {
+        Deferred {
             Future<CKRecord.ID?, Error> { promise in
                 database.delete(withRecordID: recordID) { (recordID, error) in
                     if let error = error {
@@ -54,7 +52,6 @@ extension CKRecord {
                     }
                 }
             }
-            
         }
         .eraseToAnyPublisher()
     }
@@ -64,10 +61,8 @@ extension CKRecord {
                       sortDescriptors: [NSSortDescriptor]? = nil,
                       limit: Int = 400,
                       in database: CKDatabase) -> FetchPublisher {
-        
         let query = CKQuery(recordType: recordType, predicate: predicate)
-        query.sortDescriptors = sortDescriptors
-        
+        query.sortDescriptors = sortDescriptors        
         return FetchPublisher(
             database: database,
             query: query,
@@ -83,14 +78,12 @@ extension CKRecord {
         )
     }
     
-    static func modify(recordsToSave records: [CKRecord]?, recordIDsToDelete recordIDs: [CKRecord.ID]?, in database: CKDatabase) -> AnyPublisher<RecordModifyEvent?, Error> {
-        
-        return RecordModifier(subscriber: <#T##_#>, database: database, recordsToSave: records, recordIDsToDelete: recordIDs)
-        
-        return Observable.create { observer in
-            _ = RecordModifier(observer: observer, database: database, recordsToSave: records, recordIDsToDelete: recordIDs)
-            return Disposables.create()
-        }
+    static func modifyPublisher(recordsToSave records: [CKRecord]?, recordIDsToDelete recordIDs: [CKRecord.ID]?, in database: CKDatabase) -> ModifyPublisher {
+        ModifyPublisher(
+            database: database,
+            recordsToSave: records,
+            recordIDsToDelete: recordIDs
+        )
     }
 
 }
