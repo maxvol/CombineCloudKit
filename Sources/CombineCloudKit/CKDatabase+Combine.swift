@@ -51,7 +51,7 @@ public extension CKDatabase {
             .eraseToAnyPublisher()
     }
     
-    func modify(recordsToSave records: [CKRecord]?, recordIDsToDelete recordIDs: [CKRecord.ID]?) -> AnyPublisher<RecordModifyEvent, Error> {
+    func modifyPublisher(recordsToSave records: [CKRecord]?, recordIDsToDelete recordIDs: [CKRecord.ID]?) -> AnyPublisher<RecordModifyEvent, Error> {
         CKRecord
             .modifyPublisher(recordsToSave: records, recordIDsToDelete: recordIDs, in: self)
             .eraseToAnyPublisher()

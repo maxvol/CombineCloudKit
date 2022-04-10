@@ -35,7 +35,7 @@ public final class Cache {
     public let local = Local()
 
     private let delegate: CacheDelegate
-    private let cancellables: Set<AnyCancellable> = []
+    private var cancellableSet = Set<AnyCancellable>()
     private var cachedZoneIDs: [CKRecordZone.ID] = []
 //    private var missingZoneIDs: [CKRecordZoneID] = []
 
@@ -43,25 +43,27 @@ public final class Cache {
         self.delegate = delegate
         self.zoneIDs = zoneIDs
     }
-
-/*
-
+    
+    // MARK: - standard
+    
     public func applicationDidFinishLaunching(fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void = { _ in }) {
-
         let zones = zoneIDs.map({ Zone.create(name: $0) })
 
-        cloud
-            .privateDB
-            .rx
-            .modify(recordZonesToSave: zones, recordZoneIDsToDelete: nil).subscribe { event in
-                switch event {
-                case .success(let (saved, deleted)):
-                    os_log("saved", log: Log.cache, type: .info)
-                case .error(let error):
-                    os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
-                }
-            }
-            .disposed(by: disposeBag)
+#warning ("TODO")
+// TODO:
+//        cloud
+//            .privateDB
+//            .rx
+//            .modify(recordZonesToSave: zones, recordZoneIDsToDelete: nil).subscribe { event in
+//                switch event {
+//                case .success(let (saved, deleted)):
+//                    os_log("saved", log: Log.cache, type: .info)
+//                case .error(let error):
+//                    os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
+//                }
+//            }
+        //        .sink()
+        //        .store(in: &self.cancellableSet)
 
         if let subscriptionId = self.local.subscriptionID(for: Cache.privateSubscriptionID) {
 //            cloud
@@ -71,29 +73,31 @@ public final class Cache {
             // TODO
             //                        let subscription = CKDatabaseSubscription.init(subscriptionID: Cache.privateSubscriptionID)
         } else {
-
             let subscription = CKDatabaseSubscription()
             let notificationInfo = CKSubscription.NotificationInfo()
             notificationInfo.shouldSendContentAvailable = true
             subscription.notificationInfo = notificationInfo
 
-            cloud
-                .privateDB
-                .rx
-                .modify(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil).subscribe { event in
-                    switch event {
-                    case .success(let (saved, deleted)):
-                        os_log("saved", log: Log.cache, type: .info)
-                        if let subscriptions = saved {
-                            for subscription in subscriptions {
-                                self.local.save(subscriptionID: subscription.subscriptionID, for: Cache.privateSubscriptionID)
-                            }
-                        }
-                    case .error(let error):
-                        os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
-                    }
-                }
-                .disposed(by: disposeBag)
+#warning ("TODO")
+// TODO:
+//            cloud
+//                .privateDB
+//                .rx
+//                .modify(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil).subscribe { event in
+//                    switch event {
+//                    case .success(let (saved, deleted)):
+//                        os_log("saved", log: Log.cache, type: .info)
+//                        if let subscriptions = saved {
+//                            for subscription in subscriptions {
+//                                self.local.save(subscriptionID: subscription.subscriptionID, for: Cache.privateSubscriptionID)
+//                            }
+//                        }
+//                    case .error(let error):
+//                        os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
+//                    }
+//                }
+            //        .sink()
+            //        .store(in: &self.cancellableSet)
         }
 
         // TODO same for shared
@@ -105,16 +109,12 @@ public final class Cache {
 //        }
 
         self.fetchDatabaseChanges(fetchCompletionHandler: completionHandler)
-
     }
 
     public func applicationDidReceiveRemoteNotification(userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let dict = userInfo as! [String: NSObject]
         let notification = CKNotification(fromRemoteNotificationDictionary: dict)
-        
-        guard let notificationType = notification?.notificationType else {
-            return
-        }
+        guard let notificationType = notification?.notificationType else { return }
         
         switch notificationType {
         case .query:
@@ -133,40 +133,50 @@ public final class Cache {
             break
         }
     }
+    
+    // MARK: - custom
 
     public func fetchDatabaseChanges(fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let token = self.local.token(for: Cache.privateTokenKey)
-        cloud.privateDB.rx.fetchChanges(previousServerChangeToken: token).subscribe { event in
-            switch event {
-            case .next(let zoneEvent):
-                print("\(zoneEvent)")
 
-                switch zoneEvent {
-                case .changed(let zoneID):
-                    os_log("changed: %@", log: Log.cache, type: .info, zoneID)
-                    self.cacheChanged(zoneID: zoneID)
-                case .deleted(let zoneID):
-                    os_log("deleted: %@", log: Log.cache, type: .info, zoneID)
-                    self.delegate.deleteCache(in: zoneID)
-                case .token(let token):
-                    os_log("token: %@", log: Log.cache, type: .info, token)
-                    self.local.save(token: token, for: Cache.privateTokenKey)
-                    self.processAndPurgeCachedZones(fetchCompletionHandler: completionHandler)
-                }
-
-            case .error(let error):
-                os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
-                completionHandler(.failed)
-            case .completed:
-
-                if self.cachedZoneIDs.count == 0 {
-                    completionHandler(.noData)
-                }
-
-            }
-        }.disposed(by: disposeBag)
+#warning ("TODO")
+// TODO:
+//        cloud
+//            .privateDB
+//            .fetchChanges(previousServerChangeToken: token).subscribe { event in
+//            switch event {
+//            case .next(let zoneEvent):
+//                print("\(zoneEvent)")
+//
+//                switch zoneEvent {
+//                case .changed(let zoneID):
+//                    os_log("changed: %@", log: Log.cache, type: .info, zoneID)
+//                    self.cacheChanged(zoneID: zoneID)
+//                case .deleted(let zoneID):
+//                    os_log("deleted: %@", log: Log.cache, type: .info, zoneID)
+//                    self.delegate.deleteCache(in: zoneID)
+//                case .token(let token):
+//                    os_log("token: %@", log: Log.cache, type: .info, token)
+//                    self.local.save(token: token, for: Cache.privateTokenKey)
+//                    self.processAndPurgeCachedZones(fetchCompletionHandler: completionHandler)
+//                }
+//
+//            case .error(let error):
+//                os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
+//                completionHandler(.failed)
+//            case .completed:
+//
+//                if self.cachedZoneIDs.count == 0 {
+//                    completionHandler(.noData)
+//                }
+//
+//            }
+//        }
+//        .sink()
+//        .store(in: &self.cancellableSet)
     }
-
+    
+/*
     public func fetchZoneChanges(recordZoneIDs: [CKRecordZone.ID], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         var optionsByRecordZoneID: [CKRecordZone.ID: CKFetchRecordZoneChangesOperation.ZoneOptions] = [:]
 
@@ -219,12 +229,10 @@ public final class Cache {
          self.cachedZoneIDs = []
          self.fetchZoneChanges(recordZoneIDs: recordZoneIDs, fetchCompletionHandler: completionHandler)
      }
-
-
  */
 
     public func cacheChanged(zoneID: CKRecordZone.ID) {
         self.cachedZoneIDs.append(zoneID)
     }
-
+    
 }
