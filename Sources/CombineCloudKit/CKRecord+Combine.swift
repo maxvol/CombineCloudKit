@@ -63,31 +63,34 @@ extension CKRecord {
                       predicate: NSPredicate = NSPredicate(value: true),
                       sortDescriptors: [NSSortDescriptor]? = nil,
                       limit: Int = 400,
-                      in database: CKDatabase) -> FetcherPublisher {
+                      in database: CKDatabase) -> FetchPublisher {
         
         let query = CKQuery(recordType: recordType, predicate: predicate)
         query.sortDescriptors = sortDescriptors
         
-        return FetcherPublisher(
+        return FetchPublisher(
             database: database,
             query: query,
             limit: limit
         )
     }
     
-/*
-    static func fetchChanges(recordZoneIDs: [CKRecordZone.ID], optionsByRecordZoneID: [CKRecordZone.ID : CKFetchRecordZoneChangesOperation.ZoneOptions]? = nil, in database: CKDatabase) -> Observable<RecordEvent> {
-        return Observable.create { observer in
-            _ = RecordChangeFetcher(observer: observer, database: database, recordZoneIDs: recordZoneIDs, optionsByRecordZoneID: optionsByRecordZoneID)
-            return Disposables.create()
-        }
+    static func fetchChangesPublisher(recordZoneIDs: [CKRecordZone.ID], optionsByRecordZoneID: [CKRecordZone.ID : CKFetchRecordZoneChangesOperation.ZoneOptions]? = nil, in database: CKDatabase) -> FetchChangesPublisher {
+        FetchChangesPublisher(
+            database: database,
+            recordZoneIDs: recordZoneIDs,
+            optionsByRecordZoneID: optionsByRecordZoneID
+        )
     }
     
-    static func modify(recordsToSave records: [CKRecord]?, recordIDsToDelete recordIDs: [CKRecord.ID]?, in database: CKDatabase) -> Observable<RecordModifyEvent> {
+    static func modify(recordsToSave records: [CKRecord]?, recordIDsToDelete recordIDs: [CKRecord.ID]?, in database: CKDatabase) -> AnyPublisher<RecordModifyEvent?, Error> {
+        
+        return RecordModifier(subscriber: <#T##_#>, database: database, recordsToSave: records, recordIDsToDelete: recordIDs)
+        
         return Observable.create { observer in
             _ = RecordModifier(observer: observer, database: database, recordsToSave: records, recordIDsToDelete: recordIDs)
             return Disposables.create()
         }
     }
-*/
+
 }

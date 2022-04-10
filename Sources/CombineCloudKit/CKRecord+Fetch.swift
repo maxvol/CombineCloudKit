@@ -1,5 +1,5 @@
 //
-//  CKRecord+Fetcher.swift
+//  CKRecord+Fetch.swift
 //  
 //
 //  Created by Maxim Volgin on 30/09/2021.
@@ -11,7 +11,7 @@ import CloudKit
 @available(macOS 10, iOS 13, *)
 extension CKRecord {
     
-    struct FetcherPublisher: Publisher {
+    struct FetchPublisher: Publisher {
         typealias Output = CKRecord
         typealias Failure = Error
 
@@ -20,40 +20,32 @@ extension CKRecord {
         let limit: Int
         
         func receive<S: Subscriber>(subscriber: S) where S.Input == Output, S.Failure == Failure {
-            let subscription = FetcherSubscription<S>(subscriber: subscriber, publisher: self)
+            let subscription = FetchSubscription<S>(subscriber: subscriber, publisher: self)
             subscriber.receive(subscription: subscription)
             subscription.fetch(query: self.query)
         }
         
     }
-    
-}
-
-@available(macOS 10, iOS 13, *)
-private extension CKRecord {
-    
-    class FetcherSubscription<Target: Subscriber>: Subscription where Target.Input == CKRecord, Target.Failure == Error {
+        
+    final class FetchSubscription<Target: Subscriber>: Subscription where Target.Input == CKRecord, Target.Failure == Error {
             
         private var subscriber: Target?
-        private let publisher: FetcherPublisher
+        private let publisher: FetchPublisher
         
-        init(subscriber: Target, publisher: FetcherPublisher) {
+        init(subscriber: Target, publisher: FetchPublisher) {
             self.subscriber = subscriber
             self.publisher = publisher
         }
 
         func request(_ demand: Subscribers.Demand) {}
 
-        func cancel() {
-            subscriber = nil
-        }
+        func cancel() { subscriber = nil }
         
         // MARK: - private
         
         fileprivate func fetch(query: CKQuery) {
             let operation = CKQueryOperation(query: query)
             self.setupAndAdd(operation: operation)
-
         }
 
         private func setupAndAdd(operation: CKQueryOperation) {
