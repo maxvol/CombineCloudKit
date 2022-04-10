@@ -1,6 +1,8 @@
 # CombineCloudKit
 Access CloudKit via Combine
 
+Cloned from RxCloudKit, instead of `.rx.something` write `.somethingPublisher` -
+
 Basic usage.
 
 ```swift
