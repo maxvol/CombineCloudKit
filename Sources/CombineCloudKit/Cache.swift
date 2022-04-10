@@ -77,25 +77,24 @@ public final class Cache {
             notificationInfo.shouldSendContentAvailable = true
             subscription.notificationInfo = notificationInfo
 
-#warning ("TODO")
-// TODO:
-//            cloud
-//                .privateDB
-//                .modify(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil).subscribe { event in
-//                    switch event {
-//                    case .success(let (saved, deleted)):
-//                        os_log("saved", log: Log.cache, type: .info)
-//                        if let subscriptions = saved {
-//                            for subscription in subscriptions {
-//                                self.local.save(subscriptionID: subscription.subscriptionID, for: Cache.privateSubscriptionID)
-//                            }
-//                        }
-//                    case .error(let error):
-//                        os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
-//                    }
-//                }
-            //        .sink()
-            //        .store(in: &self.cancellableSet)
+            cloud
+                .privateDB
+                .modifyPublisher(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .failure(let error):
+                        os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
+                    case .finished:
+                        os_log("saved", log: Log.cache, type: .info)
+                    }
+                }, receiveValue: { (saved, deleted) in
+                    if let subscriptions = saved {
+                        for subscription in subscriptions {
+                            self.local.save(subscriptionID: subscription.subscriptionID, for: Cache.privateSubscriptionID)
+                        }
+                    }
+                })
+                .store(in: &self.cancellableSet)
         }
 
         // TODO same for shared
