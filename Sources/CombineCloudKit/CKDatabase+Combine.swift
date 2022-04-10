@@ -10,9 +10,9 @@ import CloudKit
 
 @available(macOS 10, iOS 13, *)
 public extension CKDatabase {
-/*
     // MARK:- zones
 
+    /*
     func fetch(with recordZoneID: CKRecordZone.ID) -> Maybe<CKRecordZone> {
         return CKRecordZone.rx.fetch(with: recordZoneID, in: self.base)
     }
@@ -20,11 +20,14 @@ public extension CKDatabase {
     func modify(recordZonesToSave: [CKRecordZone]?, recordZoneIDsToDelete: [CKRecordZone.ID]?) -> Single<([CKRecordZone]?, [CKRecordZone.ID]?)> {
         return CKRecordZone.rx.modify(recordZonesToSave: recordZonesToSave, recordZoneIDsToDelete: recordZoneIDsToDelete, in: self.base)
     }
-    
-    func fetchChanges(previousServerChangeToken: CKServerChangeToken?, limit: Int = 99) -> Observable<ZoneEvent> {
-        return CKRecordZone.rx.fetchChanges(previousServerChangeToken: previousServerChangeToken, limit: limit, in: self.base)
+     */
+
+    func fetchChangesPublisher(previousServerChangeToken: CKServerChangeToken?, limit: Int = 99) -> AnyPublisher<ZoneEvent, Error> {
+        CKRecordZone
+            .fetchChangesPublisher(previousServerChangeToken: previousServerChangeToken, limit: limit, in: self)
+            .eraseToAnyPublisher()
     }
-*/
+    
     // MARK:- records
 
     func savePublisher(record: CKRecord) -> AnyPublisher<CKRecord?, Error> {

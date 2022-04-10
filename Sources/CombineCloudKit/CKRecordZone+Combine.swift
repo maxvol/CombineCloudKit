@@ -8,9 +8,9 @@
 import Combine
 import CloudKit
 
-/*
 @available(macOS 10, iOS 13, *)
-public extension Reactive where Base: CKRecordZone {
+extension CKRecordZone {
+/*
 
     static func fetch(with recordZoneID: CKRecordZone.ID, in database: CKDatabase) -> Maybe<CKRecordZone> {
         return Maybe<CKRecordZone>.create { maybe in
@@ -45,12 +45,15 @@ public extension Reactive where Base: CKRecordZone {
         }
     }
 
-    static func fetchChanges(previousServerChangeToken: CKServerChangeToken?, limit: Int = 400, in database: CKDatabase) -> Observable<ZoneEvent> {
-        return Observable.create { observer in
-            _ = ZoneChangeFetcher(observer: observer, database: database, previousServerChangeToken: previousServerChangeToken, limit: limit)
-            return Disposables.create()
-        }
+
+*/
+    
+    static func fetchChangesPublisher(previousServerChangeToken: CKServerChangeToken?, limit: Int = 400, in database: CKDatabase) -> FetchChangesPublisher {
+        FetchChangesPublisher(
+            database: database,
+            limit: limit,
+            previousServerChangeToken: previousServerChangeToken
+        )
     }
 
 }
-*/
