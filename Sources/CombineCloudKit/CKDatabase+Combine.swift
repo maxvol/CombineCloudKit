@@ -12,10 +12,11 @@ import CloudKit
 public extension CKDatabase {
     // MARK:- zones
 
-    /*
-    func fetch(with recordZoneID: CKRecordZone.ID) -> Maybe<CKRecordZone> {
-        return CKRecordZone.rx.fetch(with: recordZoneID, in: self.base)
+    func fetchPublisher(with recordZoneID: CKRecordZone.ID) -> AnyPublisher<CKRecordZone?, Error> {
+        return CKRecordZone.fetchPublisher(with: recordZoneID, in: self)
     }
+
+    /*
 
     func modify(recordZonesToSave: [CKRecordZone]?, recordZoneIDsToDelete: [CKRecordZone.ID]?) -> Single<([CKRecordZone]?, [CKRecordZone.ID]?)> {
         return CKRecordZone.rx.modify(recordZonesToSave: recordZonesToSave, recordZoneIDsToDelete: recordZoneIDsToDelete, in: self.base)

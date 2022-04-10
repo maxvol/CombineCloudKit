@@ -10,24 +10,22 @@ import CloudKit
 
 @available(macOS 10, iOS 13, *)
 extension CKRecordZone {
-/*
-
-    static func fetch(with recordZoneID: CKRecordZone.ID, in database: CKDatabase) -> Maybe<CKRecordZone> {
-        return Maybe<CKRecordZone>.create { maybe in
-            database.fetch(withRecordZoneID: recordZoneID) { (zone, error) in
-                if let error = error {
-                    maybe(.error(error))
-                    return
+    
+    static func fetchPublisher(with recordZoneID: CKRecordZone.ID, in database: CKDatabase) -> AnyPublisher<CKRecordZone?, Error> {
+        Deferred {
+            Future<CKRecordZone?, Error> { promise in
+                database.fetch(withRecordZoneID: recordZoneID) { (zone, error) in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(zone))
+                    }
                 }
-                guard zone != nil else {
-                    maybe(.completed)
-                    return
-                }
-                maybe(.success(zone!))
             }
-            return Disposables.create()
         }
+        .eraseToAnyPublisher()
     }
+/*
 
     static func modify(recordZonesToSave: [CKRecordZone]?, recordZoneIDsToDelete: [CKRecordZone.ID]?, in database: CKDatabase) -> Single<([CKRecordZone]?, [CKRecordZone.ID]?)> {
         return Single<([CKRecordZone]?, [CKRecordZone.ID]?)>.create { single in
