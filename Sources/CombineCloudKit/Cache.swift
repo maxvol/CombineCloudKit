@@ -139,44 +139,37 @@ public final class Cache {
     public func fetchDatabaseChanges(fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         let token = self.local.token(for: Cache.privateTokenKey)
 
-#warning ("TODO")
-// TODO:
-//        cloud
-//            .privateDB
-//            .fetchChanges(previousServerChangeToken: token).subscribe { event in
-//            switch event {
-//            case .next(let zoneEvent):
-//                print("\(zoneEvent)")
-//
-//                switch zoneEvent {
-//                case .changed(let zoneID):
-//                    os_log("changed: %@", log: Log.cache, type: .info, zoneID)
-//                    self.cacheChanged(zoneID: zoneID)
-//                case .deleted(let zoneID):
-//                    os_log("deleted: %@", log: Log.cache, type: .info, zoneID)
-//                    self.delegate.deleteCache(in: zoneID)
-//                case .token(let token):
-//                    os_log("token: %@", log: Log.cache, type: .info, token)
-//                    self.local.save(token: token, for: Cache.privateTokenKey)
-//                    self.processAndPurgeCachedZones(fetchCompletionHandler: completionHandler)
-//                }
-//
-//            case .error(let error):
-//                os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
-//                completionHandler(.failed)
-//            case .completed:
-//
-//                if self.cachedZoneIDs.count == 0 {
-//                    completionHandler(.noData)
-//                }
-//
-//            }
-//        }
-//        .sink()
-//        .store(in: &self.cancellableSet)
+        cloud
+            .privateDB
+            .fetchChangesPublisher(previousServerChangeToken: token)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
+                    completionHandler(.failed)
+                case .finished:
+                    if self.cachedZoneIDs.count == 0 {
+                        completionHandler(.noData)
+                    }
+                }
+
+            }, receiveValue: { zoneEvent in
+                switch zoneEvent {
+                case .changed(let zoneID):
+                    os_log("changed: %@", log: Log.cache, type: .info, zoneID)
+                    self.cacheChanged(zoneID: zoneID)
+                case .deleted(let zoneID):
+                    os_log("deleted: %@", log: Log.cache, type: .info, zoneID)
+                    self.delegate.deleteCache(in: zoneID)
+                case .token(let token):
+                    os_log("token: %@", log: Log.cache, type: .info, token)
+                    self.local.save(token: token, for: Cache.privateTokenKey)
+                    self.processAndPurgeCachedZones(fetchCompletionHandler: completionHandler)
+                }
+            })
+            .store(in: &self.cancellableSet)
     }
     
-/*
     public func fetchZoneChanges(recordZoneIDs: [CKRecordZone.ID], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         var optionsByRecordZoneID: [CKRecordZone.ID: CKFetchRecordZoneChangesOperation.ZoneOptions] = [:]
 
@@ -191,45 +184,41 @@ public final class Cache {
 
         cloud
             .privateDB
-            .rx
-            .fetchChanges(recordZoneIDs: recordZoneIDs, optionsByRecordZoneID: optionsByRecordZoneID).subscribe { event in
-                switch event {
-                case .next(let recordEvent):
-                    print("\(recordEvent)")
-
-                    switch recordEvent {
-                    case .changed(let record):
-                        os_log("changed: %@", log: Log.cache, type: .info, record)
-                        self.delegate.cache(record: record)
-                    case .deleted(let recordID):
-                        os_log("deleted: %@", log: Log.cache, type: .info, recordID)
-                        self.delegate.deleteCache(for: recordID)
-                    case .token(let (zoneID, token)):
-                        os_log("token: %@", log: Log.cache, type: .info, "\(zoneID)->\(token)")
-                        self.local.save(zoneID: zoneID, token: token, for: Cache.zoneTokenMapKey)
-                    }
-
-                case .error(let error):
+            .fetchChangesPublisher(recordZoneIDs: recordZoneIDs, optionsByRecordZoneID: optionsByRecordZoneID)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
                     os_log("error: %@", log: Log.cache, type: .error, error.localizedDescription)
                     completionHandler(.failed)
-                case .completed:
+                case .finished:
                     completionHandler(.newData)
                 }
-            }
-            .disposed(by: disposeBag)
+            }, receiveValue: { recordEvent in
+                switch recordEvent {
+                case .changed(let record):
+                    os_log("changed: %@", log: Log.cache, type: .info, record)
+                    self.delegate.cache(record: record)
+                case .deleted(let recordID):
+                    os_log("deleted: %@", log: Log.cache, type: .info, recordID)
+                    self.delegate.deleteCache(for: recordID)
+                case .token(let (zoneID, token)):
+                    os_log("token: %@", log: Log.cache, type: .info, "\(zoneID)->\(token)")
+                    self.local.save(zoneID: zoneID, token: token, for: Cache.zoneTokenMapKey)
+                }
+            })
+            .store(in: &self.cancellableSet)
     }
  
-     public func processAndPurgeCachedZones(fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-         guard !self.cachedZoneIDs.isEmpty else {
-             completionHandler(.noData)
-             return
-         }
+    public func processAndPurgeCachedZones(fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        guard !self.cachedZoneIDs.isEmpty else {
+            completionHandler(.noData)
+            return
+        }
 
-         let recordZoneIDs = self.cachedZoneIDs
-         self.cachedZoneIDs = []
-         self.fetchZoneChanges(recordZoneIDs: recordZoneIDs, fetchCompletionHandler: completionHandler)
-     }
- */
+        let recordZoneIDs = self.cachedZoneIDs
+        self.cachedZoneIDs = []
+        self.fetchZoneChanges(recordZoneIDs: recordZoneIDs, fetchCompletionHandler: completionHandler)
+    }
 
     public func cacheChanged(zoneID: CKRecordZone.ID) {
         self.cachedZoneIDs.append(zoneID)
